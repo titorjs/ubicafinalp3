@@ -1,0 +1,108 @@
+﻿@page
+@using UbicuaFinal.Data
+@inject Service service
+
+@{
+    List<Dato> datos = service.datos();
+}
+
+<style>
+    .canvas-container {
+        display: flex;
+    }
+
+        .canvas-container > div {
+            flex: 1;
+            max-width: 50%; /* Cada canvas ocupa la mitad de la pantalla */
+            box-sizing: border-box;
+            padding: 10px; /* Ajusta el relleno según tus necesidades */
+        }
+</style>
+
+<div class="canvas-container">
+    <div>
+        <canvas id="Giro" style="max-height:400px; max-width:100%;"></canvas>
+    </div>
+    <div>
+        <canvas id="Dht" style="max-height:400px; max-width:100%;"></canvas>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // Función para realizar la llamada AJAX y actualizar los gráficos
+        function actualizarGraficos() {
+            $.ajax({
+                type: "POST",
+                url: "/Home/GetGiroX",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSuccess,
+                error: OnError
+            });
+        }
+
+        // Función de éxito que actualiza los gráficos con los nuevos datos
+        function OnSuccess(data) {
+            //alert('called');
+
+            var _data = data;
+            var _chartLabel = _data[0];
+            var _gx = _data[1];
+            var _gy = _data[2];
+            var _gz = _data[3];
+            var _temp = _data[4];
+            var _hum = _data[5];
+
+            // Actualizar gráfico Giro
+            var giroChart = new Chart("Giro", {
+                type: "line",
+                data: {
+                    labels: _chartLabel,
+                    datasets: [{
+                        label: "Gx",
+                        data: _gx
+                    },
+                    {
+                        label: "Gy",
+                        data: _gy
+                    },
+                    {
+                        label: "Gz",
+                        data: _gz
+                    }]
+                }
+            });
+
+            // Actualizar gráfico Dht
+            var dhtChart = new Chart("Dht", {
+                type: "line",
+                data: {
+                    labels: _chartLabel,
+                    datasets: [{
+                        label: "Temperatura",
+                        data: _temp
+                    },
+                    {
+                        label: "Humedad",
+                        data: _hum
+                    }]
+                }
+            });
+
+            
+        }
+
+        // Función de error para manejar posibles errores en la llamada AJAX
+        function OnError(data) {
+            console.log(data);
+            alert('error');
+        }
+
+        // Ejecutar la función cada 5 segundos (5000 milisegundos)
+        setInterval(actualizarGraficos, 5000);
+    });
+</script>

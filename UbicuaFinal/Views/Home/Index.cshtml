@@ -1,0 +1,58 @@
+﻿@page
+@using UbicuaFinal.Data
+@inject Service service
+
+<style>
+    .en-rango {
+        /* Estilos para cuando enRango() es true */
+        background-color: #aaffaa; /* Ejemplo de color de fondo verde */
+    }
+
+    .fuera-de-rango {
+        /* Estilos para cuando enRango() es false */
+        background-color: #ffaaaa; /* Ejemplo de color de fondo rojo */
+    }
+</style>
+
+<div>
+    <h2>Data Table</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>GX</th>
+                <th>GY</th>
+                <th>GZ</th>
+                <th>Temp</th>
+                <th>Hum</th>
+                <th>In Range</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var dato in service.datos())
+            {
+                <tr class="@(dato.enRango()?"en-rango":"fuera-de-rango")">
+                    <td>@dato.id</td>
+                    <td>@dato.date</td>
+                    <td>@dato.gx</td>
+                    <td>@dato.gy</td>
+                    <td>@dato.gz</td>
+                    <td>@dato.temp</td>
+                    <td>@dato.hum</td>
+                    <td>@dato.enRango()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Función para recargar la página cada 5 segundos
+    function reloadPage() {
+        location.reload(true); // Recarga la página forzando la recarga desde el servidor
+    }
+
+    // Configurar la recarga automática después de 5 segundos
+    setTimeout(reloadPage, 5000);
+</script>
